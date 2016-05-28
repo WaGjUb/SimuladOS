@@ -53,7 +53,7 @@ void RR_tick(struct politica_t *p){
     }
 }
 
-void RR_novoProcesso(){
+void RR_novoProcesso(struct politica_t *p, bcp_t* novoProcesso){
     //quando um novo processo chega, ele é inserido na fila round robin
     LISTA_BCP_inserir(p->param.rr->fifo, novoProcesso);
 }
@@ -108,6 +108,8 @@ void RR_fimProcesso(struct politica_t *p, bcp_t* processo){
  */
 
 
+
+////////////////// FCFS /////////////////////////
 void FCFS_novoProcesso(struct politica_t *p, bcp_t* novoProcesso)
 {
 	//insere o novo processo 
@@ -120,28 +122,40 @@ void FCFS_fimProcesso(struct politica_t *p, bcp_t* processo)
 	LISTA_BCP_remover(p->param.fcfs->fifo, processo->pid);
 }
 
-void FCFS_escalonar(struct politica_t *p)
+bcp_t* FCFS_escalonar(struct politica_t *p)
 {
 	//Se não tiver ninguem na lista retorna NULL
-	if (p->param.fcfs->fifo->tam == 0)
-		return NULL;
-	bcp_t* ret;
-	ret = p->param.fcfs->fifo->data[0];
-	//se o processo estiver bloqueado ainda
-	if (LISTA_BCP_buscar(bloqueados, ret->pid != LISTA_N_ENCONTRADO))
+	bcp_t* ret = NULL;
+	int i;
+	//vai percorrendo a lista ate chegar no final ou até achar alguem desbloqueado
+	for (i=0; i < p->param.fcfs->fifo->tam; i++)
 	{
-		//espera ele terminar e ninguem é executado
-		return NULL;
-	}
-	else
-	{
-		//se não remove ele do prontos e continua executando
-		LISTA_BCP_remover(prontos, ret->pid);
-		return ret;		
-	}
+		ret = p->param.fcfs->fifo->data[i];
+		//se o processo não estiver bloqueado
+		if (LISTA_BCP_buscar(bloqueados, ret->pid) == LISTA_N_ENCONTRADO)
+		{
+			//remove ele do prontos e retorna ele para ser executado
+			LISTA_BCP_remover(prontos, ret->pid);
+			return ret;		
+		}
+		else
+		{
+			//se não entra no loop de novo e pega o proximo da lista
+			ret = NULL; // para se esse for o final da lista não executar ninguem
+		}
 
-	
+	}
+	return ret;
 }
+
+////////////////////////////////FP/////////////////////////////////
+void FP_novoProcesso(struct politica_t *p, bcp_t* novoProcesso)
+{
+	
+	//insere o novo processo 
+	LISTA_BCP_inserir(p->param.fcfs->fifo, novoProcesso);
+}
+
 politica_t* POLITICARR_criar(FILE* arqProcessos){
     politica_t* p;
     char* s;
@@ -205,12 +219,14 @@ politica_t* POLITICA_criar(FILE* arqProcessos){
     }
     
     if(!strncmp(str, "fcfs", 4)){
-        p->param.fcfs = LISTA_BCP_criar();
-        p->politica = POL_FCFS;
-        p->escalonar = NULL;
-        p->tick = DUMMY_tick;
-        p->novoProcesso = DUMMY_novo;
-        p->fimProcesso = DUMMY_fim;
+	fcfs_t *fcfs = (fcfs_t*) malloc(sizeof(fcfs));
+	fcfs->fifo = LISTA_BCP_criar();
+        p->param.fcfs = fcfs; //ON
+        p->politica = POL_FCFS; 
+        p->escalonar = FCFS_escalonar; // ON
+        p->tick = DUMMY_tick; 
+        p->novoProcesso = FCFS_novoProcesso; //ON
+        p->fimProcesso = FCFS_fimProcesso; //ON
         p->desbloqueado = DUMMY_desbloqueado;
     }
     

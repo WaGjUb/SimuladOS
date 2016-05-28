@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     //Ler arquivo de processos
     processos = PROCESSOS_ler(experimento->arq_processos);
     
-#ifndef SIM_DEBUG
+#ifdef SIM_DEBUG
     PROCESSOS_imprimir(processos);
 #endif
     
@@ -152,13 +152,12 @@ int main(int argc, char** argv) {
                     //retirar o processo de execução
                     executando = NULL;
                 }
-//TODO AQUI ESTOU
                 else{
                     //Se não for evento de término, é um evento de bloqueio
                     executando->proxEvento++;
                     //O próximo evento é um desbloqueio! 
                     executando->tempoBloqueio = executando->eventos[executando->proxEvento]->tempo + 1;
-                    
+                   //TODO pega aqui o tempo de bloqueio e soma numa variavel global para calcular o TME 
                     //Apontar para o próximo evento
                     executando->proxEvento++;
                     
