@@ -101,13 +101,67 @@ void RR_fimProcesso(struct politica_t *p, bcp_t* processo){
     LISTA_BCP_remover(p->param.rr->fifo, processo->pid);
 }
 
+/***********************RANDOM***********************/
+void RANDOM_tick(struct politica_t *p){
+	p->param.random->numeroAleatorio+=41;
+    return;
+}
+
+void RANDOM_novo(struct politica_t *p, bcp_t* novoProcesso){
+	/*Para deixar mais "Aleatorio"*/
+	p->param.random->numeroAleatorio += novoProcesso->pid;
+	/*Insere na lista*/
+	LISTA_BCP_inserir(p->param.random->lista, novoProcesso);
+    return;
+}
+
+void RANDOM_fim(struct politica_t *p, bcp_t* processoTerminado){
+	/*Para deixar mais "Aleatorio"*/
+	p->param.random->numeroAleatorio += processoTerminado->pid;
+	/*Remove o processo da lista*/
+	LISTA_BCP_remover(p->param.random->lista, processoTerminado->pid);
+    return;
+}
+
+void RANDOM_desbloqueado(struct politica_t* p, bcp_t* processoDesbloqueado){
+	/*Para deixar mais "Aleatorio"*/
+	p->param.random->numeroAleatorio += processoDesbloqueado->pid;
+	
+    return;
+}
+
+bcp_t* RANDOM_escalonar(struct politica_t *p){
+
+	/*se não houver processos para serem executados*/
+	/*retorna NULL*/
+	if( p->param.random->lista->tam == 0 ){
+		return NULL;
+	}
+
+	/*Se houver, remove  um processo da lista de prontos 
+	  e remove da lista de bloqueados*/
+	int indice;
+	bcp_t * ret = NULL;
+
+	if( prontos->tam )
+	{
+		indice = p->param.random->numeroAleatorio % prontos->tam;
+		ret = prontos->data[indice];
+		LISTA_BCP_remover(bloqueados, ret->pid );
+		LISTA_BCP_remover(prontos,ret->pid);
+	}
+
+	/*se não houverem processos prontos, retorna NULL*/
+	return ret;
+}
+
+
+/****************************************************/
+
 
 /**
- * Criar uma instância da poĺítica round-robin
+ * Criar uma instância da política First Come First Served
  */
-
-
-
 ////////////////// FCFS /////////////////////////
 void FCFS_novoProcesso(struct politica_t *p, bcp_t* novoProcesso)
 {
@@ -320,13 +374,16 @@ politica_t* POLITICA_criar(FILE* arqProcessos){ //esse aqui na vdd é o arquivo 
     }
     
     if(!strncmp(str, "random",6)){
-        p->param.rr = NULL;
+		random_t* random = (random_t*) malloc(sizeof(random_t));
+		random->lista = LISTA_BCP_criar();
+
+        p->param.random = random;
         p->politica = POL_RANDOM;
-        p->escalonar = NULL;
-        p->tick = DUMMY_tick;
-        p->novoProcesso = DUMMY_novo;
-        p->fimProcesso = DUMMY_fim;
-        p->desbloqueado = DUMMY_desbloqueado;
+        p->escalonar = RANDOM_escalonar;
+        p->tick = RANDOM_tick;
+        p->novoProcesso = RANDOM_novo;
+        p->fimProcesso = RANDOM_fim;
+        p->desbloqueado = RANDOM_desbloqueado;
     }
     
     if(!strncmp(str, "rr", 2)){
