@@ -5,7 +5,7 @@
 *Politicas:
 	*SJF			(Vitorio)
 	*Random			(Vitorio)	
-	*FIFO			(Daniel)
-	*Fila de Prioridade 	(Daniel)
+	*FIFO			(Daniel) OK
+	*Fila de Prioridade 	(Daniel) OK
 
 

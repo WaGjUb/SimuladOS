@@ -1,6 +1,6 @@
 CC=gcc
 DEBUG=-ggdb
-CFLAGS=
+CFLAGS= -Wall
 LDFLAGS=
 OPT=-O0
 

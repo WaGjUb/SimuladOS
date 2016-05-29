@@ -5,6 +5,7 @@
 
 typedef struct arq_processos_t{
     int nProcessos;
+    char* faixaPrioridade;
     bcp_t** processos;
 }arq_processos_t;
 

@@ -73,7 +73,6 @@ bcp_t* RR_escalonar(struct politica_t *p){
         if(p->param.rr->pos >= p->param.rr->fifo->tam){
             p->param.rr->pos = 0;
         }
-
         ret = p->param.rr->fifo->data[p->param.rr->pos];
 
         //verificar se o atual da fila round-robin está bloqueado
@@ -148,15 +147,7 @@ bcp_t* FCFS_escalonar(struct politica_t *p)
 	return ret;
 }
 
-////////////////////////////////FP/////////////////////////////////
-void FP_novoProcesso(struct politica_t *p, bcp_t* novoProcesso)
-{
-	
-	//insere o novo processo 
-	LISTA_BCP_inserir(p->param.fcfs->fifo, novoProcesso);
-}
-
-politica_t* POLITICARR_criar(FILE* arqProcessos){
+politica_t* POLITICARR_criar(FILE* arqProcessos, char* quantum){
     politica_t* p;
     char* s;
     rr_t* rr;
@@ -175,9 +166,15 @@ politica_t* POLITICARR_criar(FILE* arqProcessos){
     //Alocar a struct que contém os parâmetros para a política round-robin
     rr = malloc(sizeof(rr_t));
     s = malloc(sizeof(char) * 10);
-    
+
+    if(quantum == NULL)
+	{
     fgets(s, 10, arqProcessos);
-    
+    }
+	else
+	{
+		strcpy(s, quantum);
+	}
     //inicializar a estrutura de dados round-robin
     rr->quantum = atoi(s);
     rr->fifo = LISTA_BCP_criar();
@@ -192,16 +189,108 @@ politica_t* POLITICARR_criar(FILE* arqProcessos){
     
 }
 
-politica_t* POLITICAFP_criar(FILE* arqProcessos){
-    return NULL;
+////////////////////////////////FP/////////////////////////////////
+void FP_novoProcesso(struct politica_t *p, bcp_t* novoProcesso)
+{
+	//TODO implementar a lista
+	//indice da lista que será inserido o novo processo
+	int indice;
+	indice = novoProcesso->prioridade-1; //conversão de 0-39 indices e 1-40 prioridade
+	//chama a função de inserir correspondente ao novo processo :) 
+	p->param.fp->filas[indice]->novoProcesso(p->param.fp->filas[indice], novoProcesso);
 }
 
-politica_t* POLITICA_criar(FILE* arqProcessos){
+void FP_fimProcesso(struct politica_t *p, bcp_t* processo)
+{
+	//armazena o indice correspondente ao algoritmo
+	int indice;
+	//conversão
+	indice = processo->prioridade-1;
+	//chama a função de remoção correta
+	p->param.fp->filas[indice]->fimProcesso(p->param.fp->filas[indice], processo);
+}
+
+bcp_t* FP_escalonar(struct politica_t *p)
+{
+
+	int i;
+	bcp_t* ret = NULL; 
+	//percorre a fila do indice mais baixo (maior prioridade) ate o o mais alto (maior prioridade)
+	for (i=0; i<NUM_FILAS; i++)
+	{
+		//chama o escalonar de cada posição da lista 
+		ret = p->param.fp->filas[i]->escalonar(p->param.fp->filas[i]);
+		//se encontrar algum processo para ser excutado retorna ele
+		if (ret != NULL)
+		{
+			return ret;
+		}
+	}
+	
+	return ret;
+}
+
+
+void FP_tick(struct politica_t *p){
+	if (executando)
+	{
+		p->param.fp->filas[executando->prioridade-1]->tick(p->param.fp->filas[executando->prioridade-1]);
+	}  
+}
+
+void FP_desbloqueado(struct politica_t* p, bcp_t* processo)
+{
+		p->param.fp->filas[processo->prioridade-1]->desbloqueado(p->param.fp->filas[processo->prioridade-1], processo);
+}
+
+
+politica_t* POLITICAFP_criar(FILE* arqProcessos){
+
+ politica_t* p;
+    char s[25];
+    fp_t* fp;
+	int i;    
+
+    p = malloc(sizeof(politica_t));
+    
+    p->politica = POL_FP;
+    
+    //Ligar os callbacks com as rotinas FP
+  
+  p->escalonar = FP_escalonar;
+    p->tick = FP_tick;
+    p->novoProcesso = FP_novoProcesso;
+    p->fimProcesso = FP_fimProcesso;
+    p->desbloqueado = FP_desbloqueado;
+    
+    //Alocar a struct que contém os parâmetros para a política FP
+    fp = malloc(sizeof(fp_t));
+
+
+
+    fgets(s, 20, arqProcessos); //ignora a quantidade de filas
+    
+	//cria a politica para cada fila	    
+	for (i=0; i<NUM_FILAS; i++)
+	{
+
+		fp->filas[i] = POLITICA_criar(arqProcessos); //vai passando linha a linha e criando politicas
+	}
+
+    //Atualizar a política com os parâmetros do escalonador
+    p->param.fp = fp;
+    
+    
+    return p;
+}
+
+politica_t* POLITICA_criar(FILE* arqProcessos){ //esse aqui na vdd é o arquivo de experimentos
     char* str;
     
     str = malloc(sizeof(char) * 20);
-    
+
     fgets(str, 20, arqProcessos);
+
     
     //*(strstr(str, "\n")) = '\0';
     
@@ -242,9 +331,24 @@ politica_t* POLITICA_criar(FILE* arqProcessos){
     
     if(!strncmp(str, "rr", 2)){
         free(p);
-        p = POLITICARR_criar(arqProcessos);
+	if (!strncmp(str, "rr(", 3))
+	{
+		char string[20];
+		int k = 0;
+		while(str[k+3] != ')')
+		{
+			string[k] = str[k+3];
+			k++;
+		}
+		string[k] = '\0';
+	   p = POLITICARR_criar(arqProcessos, string);
+	}
+	else
+	{	
+     	   p = POLITICARR_criar(arqProcessos, NULL);
+ 	}
     }
-    
+
     if(!strncmp(str, "fp", 2)){
         free(p);
         p = POLITICAFP_criar(arqProcessos);

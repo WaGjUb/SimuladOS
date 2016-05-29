@@ -1,6 +1,6 @@
 #ifndef POLITICAS_H
 #define	POLITICAS_H
-
+#define NUM_FILAS 40 
 #include <stdio.h>
 
 #include "bcp.h"
@@ -39,7 +39,7 @@ typedef struct rr_t{
 }rr_t;
 
 typedef struct fp_t{
-    politica_t** filas;
+    politica_t *filas[NUM_FILAS]; 
 }fp_t;
 
 typedef struct fcfs_t{

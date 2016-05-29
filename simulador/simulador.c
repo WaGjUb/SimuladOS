@@ -26,7 +26,7 @@ bcpList_t *novos = NULL;
 bcp_t* executando = NULL;
 //Relógio do sistema
 uint64_t relogio;
-
+float TME = 0;
 int main(int argc, char** argv) {
     
     int i;
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     //Ler arquivo de processos
     processos = PROCESSOS_ler(experimento->arq_processos);
     
-#ifdef SIM_DEBUG
+#ifndef SIM_DEBUG
     PROCESSOS_imprimir(processos);
 #endif
     
@@ -112,8 +112,9 @@ int main(int argc, char** argv) {
 	//se a entrada do primeiro da lista maior ou igual que 0
              if(novos->data[0]->entrada >= 0){
     	
-	//calcula o tempo ocioso e pula o relogio para o valor da entrada do processo 
+	//calcula o tempo ocioso e o TME pula o relogio para o valor da entrada do processo 
                 tempo_ocioso += novos->data[0]->entrada - relogio;
+		TME += prontos->tam*(novos->data[0]->entrada - relogio);
                 relogio = novos->data[0]->entrada;
             }
         }
@@ -145,7 +146,6 @@ int main(int argc, char** argv) {
                     
                     //salvar o momento da última execução
                     executando->tUltimaExec = relogio;
-                    //TODO há algo incomum aqui!!
                     //Destruir o BCP do processo.
                     BCP_destruir(executando);
                     
@@ -157,7 +157,6 @@ int main(int argc, char** argv) {
                     executando->proxEvento++;
                     //O próximo evento é um desbloqueio! 
                     executando->tempoBloqueio = executando->eventos[executando->proxEvento]->tempo + 1;
-                   //TODO pega aqui o tempo de bloqueio e soma numa variavel global para calcular o TME 
                     //Apontar para o próximo evento
                     executando->proxEvento++;
                     
@@ -210,15 +209,16 @@ int main(int argc, char** argv) {
                 tempo_ocioso++;
             }
         }        
-        
+	//soma o tme todos que estão na lista de prontos desse ciclo
+        TME += prontos->tam;
         relogio++;
     }
     
-    float TME = 0;
+//    float TME = 0;
     float acum = 0;
     
     //Calcular TME! (ver definição nos slides!)
-    
+	TME = (float) TME/processos->nProcessos;  
     printf("Trocas de Contexto: %ld\n", trocas_de_contexto);
     printf("Tempo ocioso: %ld\n", tempo_ocioso);
     printf("Tempo médio de espera: %.2f\n", TME);

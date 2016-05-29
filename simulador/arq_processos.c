@@ -26,21 +26,23 @@ arq_processos_t* PROCESSOS_ler(char* arquivo_processos){
     
     //ignorar faixa de prioridades!
     fgets(s, 10, arq);
-    
+	novo->faixaPrioridade = s;    
     novo->processos = malloc(sizeof(bcp_t*) * novo->nProcessos);
     
     
     for(i = 0; i < novo->nProcessos; i++){
         novo->processos[i] = BCP_criar(arq);
     }
-    
-    free(s);
+  
+//não da o free pois a faixa de prioridade não está mais sendo ignorada  
+//    free(s);
     return novo;
 }
 
 void PROCESSOS_imprimir(arq_processos_t* proc){
     int i, j;
-    printf("número de processos: %d\n", proc->nProcessos);
+    printf("número de processos: %d\n"
+	"faixa de prioridade: %s\n", proc->nProcessos, proc->faixaPrioridade);
     
     for(i = 0; i < proc->nProcessos; i++){
         printf("PID: %d Prioridade: %d Entrada: %d nEventos: %d\n",
