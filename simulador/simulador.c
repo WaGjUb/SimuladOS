@@ -29,6 +29,7 @@ bcp_t* executando = NULL;
 uint64_t relogio;
 float TME = 0;	
 long unsigned int ticks;
+unsigned int qtdProcessosConcluidos=0;
 
 int main(int argc, char** argv) {
     
@@ -158,6 +159,7 @@ int main(int argc, char** argv) {
                     
                     //retirar o processo de execução
                     executando = NULL;
+					qtdProcessosConcluidos++;
                 }
                 else{
                     //Se não for evento de término, é um evento de bloqueio
@@ -218,7 +220,7 @@ int main(int argc, char** argv) {
                 //Dica: provavelmente aqui é um ponto que é usado para computar o TME deste processo.
                 
                 if(executando->tPrimeiraExec == -1){
-                    executando->tPrimeiraExec = relogio+1;
+					executando->tPrimeiraExec = relogio+1;
                 }
                 
             }
@@ -233,12 +235,15 @@ int main(int argc, char** argv) {
     
 //    float TME = 0;
     float acum = 0;
+	float vazao = processos->nProcessos / (relogio/1000);
     
     //Calcular TME! (ver definição nos slides!)
 	TME = (float) TME/processos->nProcessos;  
     printf("Trocas de Contexto: %ld\n", trocas_de_contexto);
     printf("Tempo ocioso: %ld\n", tempo_ocioso);
     printf("Tempo médio de espera: %.2f\n", TME);
+    printf("Vazão : %.5f\n", vazao);
+	
     
     return (EXIT_SUCCESS);
 }
