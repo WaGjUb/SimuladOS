@@ -32,6 +32,72 @@ void DUMMY_desbloqueado(struct politica_t* p, bcp_t* processoDesbloqueado){
     return;
 }
 
+/***start***Shortest Job First***start*****/
+void SJF_tick(struct politica_t *p){
+	if(executando)
+		executando->tempoRestante--;
+    return;
+}
+
+void SJF_novo(struct politica_t *p, bcp_t* novoProcesso){
+	/*add lista*/
+	LISTA_BCP_inserir(p->param.sjf->lista, novoProcesso);
+    return;
+}
+
+void SJF_fim(struct politica_t *p, bcp_t* processoTerminado){
+	/*remove lista*/
+	LISTA_BCP_remover(p->param.sjf->lista, processoTerminado->pid);
+	LISTA_BCP_remover(prontos,processoTerminado->pid);
+    return;
+}
+
+void SJF_desbloqueado(struct politica_t* p, bcp_t* processoDesbloqueado){
+    return;
+}
+
+bcp_t* SJF_escalonar(struct politica_t *p){
+
+	if( p->param.sjf->lista->tam == 0 )
+	{
+		return NULL;
+	}
+
+	/*varre a lista de processos procurando um com o tempo mais curto*/
+	bcp_t* processo;	
+	bcp_t* processoCurto;	
+	/*encontra um processo não bloqueado*/
+	int i = 0;
+	for( i=0; i< p->param.sjf->lista->tam; i++ )
+	{
+		processo = p->param.sjf->lista->data[i];
+		if(LISTA_BCP_buscar(bloqueados, processo->pid) == LISTA_N_ENCONTRADO)
+		{
+			break;
+		}
+	}
+
+	/*encotra o processo mais curto*/
+	processoCurto = processo;
+	for( i=0; i< p->param.sjf->lista->tam; i++ )
+	{
+		processo = p->param.sjf->lista->data[i];
+		if(LISTA_BCP_buscar(bloqueados, processo->pid) == LISTA_N_ENCONTRADO)
+		{
+			if( processo->tempoRestante < processoCurto->tempoRestante)
+			{
+				processoCurto = processo;
+			}
+		}
+	}
+
+	/*remove ele dos prontos e e retorna para ele ser executado*/	
+	LISTA_BCP_remover(prontos, processoCurto->pid);
+	return processoCurto;
+}
+
+/****end*************SJF**********end******/
+
 
 /*
  * Round-Robin
@@ -352,18 +418,22 @@ politica_t* POLITICA_criar(FILE* arqProcessos){ //esse aqui na vdd é o arquivo 
     p = malloc(sizeof(politica_t));
     
     if(!strncmp(str, "sjf", 3)){
-        p->param.rr = NULL;
+		sjf_t* sjf = (sjf_t*) malloc(sizeof(sjf_t));
+		sjf->lista = LISTA_BCP_criar();
+
+        p->param.sjf = sjf;
         p->politica = POL_SJF;
-        p->escalonar = NULL;
-        p->tick = DUMMY_tick;
-        p->novoProcesso = DUMMY_novo;
-        p->fimProcesso = DUMMY_fim;
-        p->desbloqueado = DUMMY_desbloqueado;
+        p->escalonar = SJF_escalonar;
+        p->tick = SJF_tick;
+        p->novoProcesso = SJF_novo;
+        p->fimProcesso = SJF_fim;
+        p->desbloqueado = SJF_desbloqueado;
     }
     
     if(!strncmp(str, "fcfs", 4)){
-	fcfs_t *fcfs = (fcfs_t*) malloc(sizeof(fcfs));
-	fcfs->fifo = LISTA_BCP_criar();
+		fcfs_t *fcfs = (fcfs_t*) malloc(sizeof(fcfs));
+		fcfs->fifo = LISTA_BCP_criar();
+
         p->param.fcfs = fcfs; //ON
         p->politica = POL_FCFS; 
         p->escalonar = FCFS_escalonar; // ON

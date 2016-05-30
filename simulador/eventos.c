@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 
+unsigned long int tempo_restante = 0;
+
 evento_t* EVENTO_criar(char* e){
     evento_t* novo;
     char* tok;
@@ -19,7 +21,10 @@ evento_t* EVENTO_criar(char* e){
         novo->evento = EVT_BLOQUEIO;
     
     if(!strcmp(tok, "DESBLOQUEIO"))
+	{
         novo->evento = EVT_DESBLOQUEIO;
+		tempo_restante += novo->tempo;
+	}
     
     if(!strcmp(tok, "TERMINO"))
         novo->evento = EVT_TERMINO;

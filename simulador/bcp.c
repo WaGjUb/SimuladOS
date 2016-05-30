@@ -3,6 +3,7 @@
 #include "bcp.h"
 #include "eventos.h"
 
+unsigned long int tempoRestante;
 void BCP_adicionarEvento(bcp_t* bcp, evento_t* e){
     if(bcp->nEventos >= bcp->alocEventos){
         bcp->alocEventos += EVENTOS_ALOC_INC;
@@ -28,6 +29,7 @@ bcp_t* BCP_criar(FILE* arqProcesso){
     char s[255];
     int i;
     int eventos;
+	tempo_restante = 0;
     
     novo = malloc(sizeof(bcp_t));
     
@@ -52,6 +54,7 @@ bcp_t* BCP_criar(FILE* arqProcesso){
         BCP_adicionarEvento(novo, EVENTO_criar(s));
     }
     
+	novo->tempoRestante = tempo_restante;
     novo->proxEvento = 0;
     novo->tempoExecutado = 0;
     novo->tPrimeiraExec = -1;

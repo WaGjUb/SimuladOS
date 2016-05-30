@@ -10,6 +10,7 @@
 typedef struct bcp_t{
     int pid;
     uint64_t tempoExecutado;
+	unsigned long int tempoRestante;
     int prioridade;
     uint64_t entrada;
     uint64_t tempoBloqueio;

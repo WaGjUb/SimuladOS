@@ -77,6 +77,6 @@ void LISTA_INT_imprimir(lista_int_t* l){
     int i;
     
     for(i = 0; i <l->tam; i++){
-        printf("%d : %d\n", i, l->data[i]);
+        printf("%d : %lu\n", i, l->data[i]);
     }
 }

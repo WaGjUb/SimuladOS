@@ -45,7 +45,7 @@ void PROCESSOS_imprimir(arq_processos_t* proc){
 	"faixa de prioridade: %s\n", proc->nProcessos, proc->faixaPrioridade);
     
     for(i = 0; i < proc->nProcessos; i++){
-        printf("PID: %d Prioridade: %d Entrada: %d nEventos: %d\n",
+        printf("PID: %d Prioridade: %d Entrada: %lu nEventos: %d\n",
                 proc->processos[i]->pid,
                 proc->processos[i]->prioridade,
                 proc->processos[i]->entrada,

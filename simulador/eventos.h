@@ -15,5 +15,7 @@ typedef struct evento_t{
 evento_t* EVENTO_criar(char* e);
 void EVENTO_imprimir(evento_t* e);
 
+extern unsigned long int tempo_restante;
+
 #endif	/* EVENTOS_H */
 
