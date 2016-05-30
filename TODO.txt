@@ -1,11 +1,14 @@
-*Arquivo de saída							-
+*Arquivo de saída                           -
 
-*Concertar Tick (opcional)	(Vitorio)		-
-*Calcular Tempo Médio de Espera	(Daniel)	OK
+*Concertar Tick (opcional)	(Vitorio)       -
+*Tempo Medio de Retorno                     -
+*Calcular Tempo Médio de Espera	(Daniel)    OK
+*Relatorio                                  -
+
 *Politicas:
-	*SJF			(Vitorio)				-
-	*Random			(Vitorio)				OK
-	*FIFO			(Daniel) 				OK
-	*Fila de Prioridade 	(Daniel) 		OK
+	*SJF			(Vitorio)               -
+	*Random			(Vitorio)               OK
+	*FIFO			(Daniel)                OK
+	*Fila de Prioridade 	(Daniel)        OK
 
 
