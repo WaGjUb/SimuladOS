@@ -4,6 +4,7 @@
 *Tempo Medio de Retorno                     -
 *Calcular Tempo Médio de Espera	(Daniel)    OK
 *Relatorio                                  -
+*Calcular Vazão                             -
 
 *Politicas:
 	*SJF			(Vitorio)               -
