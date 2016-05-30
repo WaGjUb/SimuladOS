@@ -11,6 +11,7 @@
 #include "intList.h"
 
 //#define SIM_DEBUG 
+//#define ALL_TICKS
 
 //Estrutura contendo informações sobre o experimento
 experimento_t *experimento = NULL;
@@ -26,7 +27,9 @@ bcpList_t *novos = NULL;
 bcp_t* executando = NULL;
 //Relógio do sistema
 uint64_t relogio;
-float TME = 0;
+float TME = 0;	
+long unsigned int ticks;
+
 int main(int argc, char** argv) {
     
     int i;
@@ -109,24 +112,28 @@ int main(int argc, char** argv) {
         //Isto é pra evitar o laço que somente faz relogio++ (compensa!)
         //entra no if apenas quando o programa está ocioso ou quando é inicializado
         if((bloqueados->tam == 0) && (prontos->tam == 0) && (novos->tam > 0) && (!executando)){
-	//se a entrada do primeiro da lista maior ou igual que 0
+			//se a entrada do primeiro da lista maior ou igual que 0
              if(novos->data[0]->entrada >= 0){
     	
-	//calcula o tempo ocioso e o TME pula o relogio para o valor da entrada do processo 
+				//calcula o tempo ocioso e o TME pula o relogio para o valor da entrada do processo 
                 tempo_ocioso += novos->data[0]->entrada - relogio;
-		TME += prontos->tam*(novos->data[0]->entrada - relogio);
+				TME += prontos->tam*(novos->data[0]->entrada - relogio);
+				uint64_t oldRelogio = relogio;
                 relogio = novos->data[0]->entrada;
+
+				/*quantos ticks o simulador pulou*/
+				ticks = relogio - oldRelogio;
             }
         }
         
         //verificar se algum processo novo chegou neste momento
         //se a entrada do novo é a do relogio atual
         if(novos->data[0]->entrada == relogio){
-	//é inserido no prontos
+			//é inserido no prontos
             LISTA_BCP_inserir(prontos, novos->data[0]);
-	//add o novo processo na lista da politica correta
+			//add o novo processo na lista da politica correta
             experimento->politica->novoProcesso(experimento->politica, novos->data[0]);
-	//remove do novos o primeiro elemento da lista
+			//remove do novos o primeiro elemento da lista
             LISTA_BCP_remover(novos, novos->data[0]->pid);
         }
         
@@ -170,9 +177,19 @@ int main(int argc, char** argv) {
             
         }
         
-        //Executar o que tiver que ser executado a cada tick do relógio (callback)
-        experimento->politica->tick(experimento->politica);
-        
+
+		#ifdef ALL_TICKS
+		/*chama o callback na quantidade de ticks que aconteceram*/
+		for( i=0; i< ticks; i++ )
+		{
+			//Executar o que tiver que ser executado a cada tick do relógio (callback)
+			experimento->politica->tick(experimento->politica);
+		}
+	   	#else
+		//Chama o tick menos vezes
+		experimento->politica->tick(experimento->politica);
+		#endif
+       
         //Atualizar o tempo de bloqueio de todos os processos bloqueados
         for(i = 0; i < bloqueados->tam; i++){
             bloqueados->data[i]->tempoBloqueio--;
