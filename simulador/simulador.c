@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
     //Ler arquivo de processos
     processos = PROCESSOS_ler(experimento->arq_processos);
     
-#ifndef SIM_DEBUG
+#ifdef SIM_DEBUG
     PROCESSOS_imprimir(processos);
 #endif
     
@@ -243,8 +243,11 @@ int main(int argc, char** argv) {
     printf("Tempo ocioso: %ld\n", tempo_ocioso);
     printf("Tempo médio de espera: %.2f\n", TME);
     printf("Vazão : %.5f\n", vazao);
-	
-    
+/*
+	FILE* saida;
+	saida = fopen(experimento->arq_saida,"w");
+	fprintf(saida,"CHAVEAMENTOS: %d\n"
+			"TME: %ld);
+	    fclose(saida); */
     return (EXIT_SUCCESS);
 }
-
