@@ -1,7 +1,7 @@
 *Arquivo de saída                           -
 
 *Concertar Tick (opcional)	(Vitorio)       OK
-*Tempo Medio de Retorno                     -
+*Tempo Medio de Retorno                     OK
 *Calcular Tempo Médio de Espera	(Daniel)    OK
 *Relatorio                                  -
 *Calcular Vazão                             -
