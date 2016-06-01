@@ -8,6 +8,8 @@
 extern bcpList_t *bloqueados;
 extern bcpList_t *prontos;
 extern bcp_t* executando;
+extern FILE* fp;
+extern uint64_t relogio;
 
 /*
  * Funções DUMMY são aquelas que não fazem nada... 
@@ -113,7 +115,7 @@ void RR_tick(struct politica_t *p){
         if(executando->timeSlice <= 0){
             //se o tempo do processo acabou, inserir o processo atual na lista de prontos
             LISTA_BCP_inserir(prontos, executando);
-            //remover o processo atual de execução
+fprintf(fp, "%ld %d QUANTUM_EX\n", relogio, executando->pid);
             executando = NULL;
         }
     }
