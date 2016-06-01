@@ -241,6 +241,7 @@ int main(int argc, char** argv) {
 		tempoRetorno += (processos->processos[i]->tUltimaExec - processos->processos[i]->tPrimeiraExec);
 	}
 	float TMR = (float) tempoRetorno/ processos->nProcessos;
+	float vazao = (float)processos->nProcessos / ( relogio/1000.0);
     
     //Calcular TME! (ver definição nos slides!)
 	TME = (float) TME/processos->nProcessos;  
@@ -248,7 +249,7 @@ int main(int argc, char** argv) {
     printf("Tempo ocioso: %ld\n", tempo_ocioso);
     printf("Tempo médio de espera: %.2f\n", TME);
 	printf("Tempo Medio de Retorno : %f\n",TMR);
-  //  printf("Vazão : %.5f\n", vazao);
+    printf("Vazão : %.5f\n", vazao);
 /*
 	FILE* saida;
 	saida = fopen(experimento->arq_saida,"w");
