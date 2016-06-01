@@ -238,7 +238,7 @@ int main(int argc, char** argv) {
 	long long unsigned int tempoRetorno =0 ;
 	for(i=0; i< processos->nProcessos; i++)
 	{
-		tempoRetorno += (processos->processos[i]->tUltimaExec + processos->processos[i]->tPrimeiraExec);
+		tempoRetorno += (processos->processos[i]->tUltimaExec - processos->processos[i]->tPrimeiraExec);
 	}
 	float TMR = (float) tempoRetorno/ processos->nProcessos;
     
