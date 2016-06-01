@@ -276,20 +276,28 @@ auxiliar = NULL;
 	long long unsigned int tempoRetorno =0 ;
 	for(i=0; i< processos->nProcessos; i++)
 	{
-		tempoRetorno += (processos->processos[i]->tUltimaExec + processos->processos[i]->tPrimeiraExec);
+		tempoRetorno += (processos->processos[i]->tUltimaExec - processos->processos[i]->tPrimeiraExec);
 	}
 	float TMR = (float) tempoRetorno/ processos->nProcessos;
 
-	//Calcular TME! (ver definição nos slides!)
+	float vazao = (float)processos->nProcessos / ( relogio/1000.0);
+    
+    //Calcular TME! (ver definição nos slides!)
 	TME = (float) TME/processos->nProcessos;  
 	printf("Trocas de Contexto: %ld\n", trocas_de_contexto);
 	printf("Tempo ocioso: %ld\n", tempo_ocioso);
 	printf("Tempo médio de espera: %.2f\n", TME);
 	printf("Tempo Medio de Retorno : %f\n",TMR);
 	//  printf("Vazão : %.5f\n", vazao);
-	float vazao = 0;
 	char termino[20] = "t1 t2 t3";
 	//experimento->arq_saida
+    printf("Vazão : %.5f\n", vazao);
+/*
+	FILE* saida;
+	saida = fopen(experimento->arq_saida,"w");
+	fprintf(saida,"CHAVEAMENTOS: %d\n"
+			"TME: %ld);
+	    fclose(saida); */
 
 	fprintf(saida,"CHAVEAMENTOS: %ld\n"
 			"TME: %.2f\n"
