@@ -3,5 +3,5 @@ install: make get-deps
 
 language: c
 compiler: 
-    -gcc
+    - gcc
 script: make
