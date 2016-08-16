@@ -1,7 +1,9 @@
 #install: make get-deps
 #./configure && make && make test
 
-before_install: sudo apt-get install cd
+before_install: 
+    - cd "codigo fonte"
+    - ls
 language: c
 compiler: 
     - clang
