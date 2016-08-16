@@ -7,9 +7,6 @@ compiler:
     - gcc
 before_script:
         - cd "codigo fonte"
-        - ls
-        - pwd
 script: 
-        - pwd
         - make
         
