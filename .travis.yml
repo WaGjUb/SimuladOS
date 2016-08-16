@@ -7,4 +7,5 @@ language: c
 compiler: 
     - clang
     - gcc
-script: build.sh
+before_script: cd "codigo fonte"
+script: make
