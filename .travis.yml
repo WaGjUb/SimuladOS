@@ -5,4 +5,4 @@ language: c
 compiler: 
     - clang
     - gcc
-script: cd "codigo fonte" && make
+script: cd "codigo fonte" && ls && make
