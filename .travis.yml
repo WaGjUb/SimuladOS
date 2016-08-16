@@ -2,10 +2,9 @@
 #./configure && make && make test
 
 before_install: 
-    - cd "codigo fonte"
     - ls
 language: c
 compiler: 
     - clang
     - gcc
-script: cd "codigo fonte" && make
+script: build.sh
