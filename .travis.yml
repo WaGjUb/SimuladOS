@@ -1,11 +1,15 @@
 #install: make get-deps
 #./configure && make && make test
 
-before_install: 
-    - ls
 language: c
 compiler: 
     - clang
     - gcc
-before_script: cd "codigo fonte"
-script: make
+before_script:
+        - cd "codigo fonte"
+        - ls
+        - pwd
+script: 
+        - pwd
+        - make
+        
